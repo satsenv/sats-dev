@@ -1,0 +1,9 @@
+{ pkgs, ... }:
+{
+  packages = [ pkgs.jq ];
+
+  services.bitcoind = {
+    enable = true;
+    regtest = true;
+  };
+}

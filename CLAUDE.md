@@ -1,0 +1,62 @@
+# CLAUDE.md
+
+## Shell environment
+
+Run all commands in this repository through `devenv shell --`:
+
+```sh
+devenv shell -- uvx showboat init docs/notes/example/demo.md "Title"
+```
+
+## Project overview
+
+Custom devenv modules for Bitcoin and related services, tested with `devenv-run-tests`.
+
+## Module system architecture
+
+This project extends devenv's module system from the outside.
+The key mechanism is a two-input scheme:
+
+- `devenv-run-tests` overrides the `devenv` input to point to `src/modules/`, making `top-level.nix` the module entry point.
+- `top-level.nix` imports upstream devenv's `top-level.nix` via a separate `upstream-devenv` input, then layers custom modules on top.
+- Every new module must be added to the `imports` list in `src/modules/top-level.nix` or it won't be available.
+
+The `upstream-devenv` input is declared in each test's `devenv.yaml` as `github:cachix/devenv?dir=src/modules`.
+
+## devenv-run-tests behavior
+
+- `devenv-run-tests run tests` scans the `tests/` directory for subdirectories; each subdirectory is a test.
+- Each test is copied to a temp dir, git-initialized, then `devenv test` runs inside it.
+- The argument to `run` is a parent directory, not a test name. Use `--only <name>` to filter.
+- `.test.sh` must be executable (`chmod +x`).
+
+## devenv test internals
+
+- `devenv test` provides `wait_for_processes` and `wait_for_port` as exported shell functions in the test environment.
+- `wait_for_processes` blocks until all processes with readiness probes report healthy.
+- The native process manager uses the `ready` option on process definitions (`lib/ready.nix` submodule type with `exec`, `http`, or `notify`).
+- The `process-compose` readiness probe (under `process-compose.readiness_probe`) is only used by the process-compose backend, not the native manager.
+- For compatibility with both backends, define both `ready` and `process-compose.readiness_probe`.
+
+## Test output visibility
+
+- Write test output to stderr (`>&2`) so it appears in `devenv-run-tests` output.
+
+## Documenting work with showboat
+
+Always use showboat (`uvx showboat`) to document implementation sessions.
+Create or append to a demo document under `docs/notes/` that captures what was done, key commands, and test results.
+
+Commands:
+
+- `showboat init <file> <title>` to start a new document
+- `showboat note <file> "text"` to add commentary
+- `showboat exec <file> bash "command"` to run a command and capture its output
+- `showboat pop <file>` to remove the last entry (use after failed exec before retrying)
+- `showboat verify <file>` to re-run all code blocks and check outputs still match
+- `showboat image <file> <path>` to embed an image
+
+## Test script conventions
+
+- Use `jq` for JSON parsing (add `pkgs.jq` to `packages` in the test's `devenv.nix`).
+- Call `wait_for_processes` at the start of any test that depends on running services.
