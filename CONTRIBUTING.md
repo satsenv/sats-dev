@@ -46,9 +46,11 @@ src/modules/
   top-level.nix      # Module entry point, imports upstream devenv + custom modules
   flake.nix          # Flake exposing modules directory
   bitcoind.nix       # Bitcoin daemon with regtest support
+  nostr-rs-relay.nix # Nostr relay with TOML settings
   podman.nix         # Podman machine management
 tests/
   bitcoind/          # Integration test for bitcoind (native process manager)
   bitcoind-process-compose/  # Same test with process-compose
+  nostr-rs-relay/    # Integration test for nostr-rs-relay
   podman/            # Integration test for podman-machine
 ```
