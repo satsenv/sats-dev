@@ -51,7 +51,7 @@ in
 
     regtest = lib.mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Enable regtest mode.";
     };
 
