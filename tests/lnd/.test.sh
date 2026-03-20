@@ -53,4 +53,10 @@ if [ ! -f "$LND_MACAROON_FILE" ]; then
 fi
 echo "  LND_MACAROON_FILE=$LND_MACAROON_FILE" >&2
 
+if [ -z "$LND_GRPC_HOST" ]; then
+  echo "LND_GRPC_HOST is not set" >&2
+  exit 1
+fi
+echo "  LND_GRPC_HOST=$LND_GRPC_HOST" >&2
+
 echo "lnd test passed" >&2

@@ -117,6 +117,7 @@ in
 
     env.LND_CERT_FILE = "${cfg.dataDir}/tls.cert";
     env.LND_MACAROON_FILE = macaroonPath;
+    env.LND_GRPC_HOST = "https://${cfg.rpcAddress}:${toString cfg.rpcPort}";
 
     processes.lnd = {
       after = [ "devenv:processes:bitcoind" ];
