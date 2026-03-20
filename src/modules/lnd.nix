@@ -10,13 +10,15 @@ let
 
   network = if bitcoind.regtest then "regtest" else "mainnet";
 
+  macaroonPath = "${cfg.dataDir}/chain/bitcoin/${network}/admin.macaroon";
+
   lncliCmd = ''
     ${lib.getExe' cfg.package "lncli"} \
       --network ${network} \
       --rpcserver=${cfg.rpcAddress}:${toString cfg.rpcPort} \
       --lnddir="${cfg.dataDir}" \
       --tlscertpath="${cfg.dataDir}/tls.cert" \
-      --no-macaroons'';
+      --macaroonpath="${macaroonPath}"'';
 
 
   configFile = pkgs.writeText "lnd.conf" (''
@@ -24,7 +26,6 @@ let
     tlscertpath=${cfg.dataDir}/tls.cert
     tlskeypath=${cfg.dataDir}/tls.key
     noseedbackup=1
-    no-macaroons=1
 
     listen=${cfg.listenAddress}:${toString cfg.listenPort}
     rpclisten=${cfg.rpcAddress}:${toString cfg.rpcPort}
@@ -114,6 +115,9 @@ in
       cfg.package
     ];
 
+    env.LND_CERT_FILE = "${cfg.dataDir}/tls.cert";
+    env.LND_MACAROON_FILE = macaroonPath;
+
     processes.lnd = {
       after = [ "devenv:processes:bitcoind" ];
       exec = lib.getExe (
@@ -128,7 +132,7 @@ in
       );
       ready = {
         exec = ''
-          ${lncliCmd} getinfo > /dev/null 2>&1
+          test -f "${macaroonPath}" && ${lncliCmd} getinfo > /dev/null 2>&1
         '';
         period = 2;
         failure_threshold = 30;
@@ -137,7 +141,7 @@ in
         readiness_probe = {
           exec = {
             command = pkgs.writeShellScript "is-lnd-ready" ''
-              ${lncliCmd} getinfo > /dev/null 2>&1
+              test -f "${macaroonPath}" && ${lncliCmd} getinfo > /dev/null 2>&1
             '';
           };
           failure_threshold = 30;

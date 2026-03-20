@@ -2,7 +2,7 @@
 set -e
 
 CLI="bitcoin-cli -regtest -rpcuser=devenv -rpcpassword=devenv"
-LNCLI="lncli --network regtest --rpcserver=127.0.0.1:10009 --lnddir=$DEVENV_STATE/lnd --tlscertpath=$DEVENV_STATE/lnd/tls.cert --no-macaroons"
+LNCLI="lncli --network regtest --rpcserver=127.0.0.1:10009 --lnddir=$DEVENV_STATE/lnd --tlscertpath=$LND_CERT_FILE --macaroonpath=$LND_MACAROON_FILE"
 
 wait_for_processes
 
@@ -31,5 +31,26 @@ else
   echo "$info" | jq '{synced_to_chain, synced_to_graph, block_height, block_hash}' >&2
   exit 1
 fi
+
+# Verify environment variables for TLS cert and macaroon paths
+if [ -z "$LND_CERT_FILE" ]; then
+  echo "LND_CERT_FILE is not set" >&2
+  exit 1
+fi
+if [ ! -f "$LND_CERT_FILE" ]; then
+  echo "LND_CERT_FILE does not exist: $LND_CERT_FILE" >&2
+  exit 1
+fi
+echo "  LND_CERT_FILE=$LND_CERT_FILE" >&2
+
+if [ -z "$LND_MACAROON_FILE" ]; then
+  echo "LND_MACAROON_FILE is not set" >&2
+  exit 1
+fi
+if [ ! -f "$LND_MACAROON_FILE" ]; then
+  echo "LND_MACAROON_FILE does not exist: $LND_MACAROON_FILE" >&2
+  exit 1
+fi
+echo "  LND_MACAROON_FILE=$LND_MACAROON_FILE" >&2
 
 echo "lnd test passed" >&2
