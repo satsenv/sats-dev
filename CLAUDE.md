@@ -56,6 +56,18 @@ Commands:
 - `showboat verify <file>` to re-run all code blocks and check outputs still match
 - `showboat image <file> <path>` to embed an image
 
+## Development workflow
+
+Always follow a red-green testing approach when implementing or modifying modules:
+
+1. Write the test first (`.test.sh` and `devenv.nix` under `tests/<name>/`) that exercises the desired behavior.
+2. Run the test and confirm it fails (red) for the expected reason.
+3. Implement the minimum module code in `src/modules/` to make the test pass.
+4. Run the test again and confirm it passes (green).
+5. Refactor if needed, re-running the test after each change to ensure it stays green.
+
+Start every implementation task by creating or updating the test, not the module code.
+
 ## Test script conventions
 
 - Use `jq` for JSON parsing (add `pkgs.jq` to `packages` in the test's `devenv.nix`).
