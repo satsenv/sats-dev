@@ -1,0 +1,6 @@
+site/
+generated/
+.venv/
+.devenv*
+devenv.lock
+uv.lock
