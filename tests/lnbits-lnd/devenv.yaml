@@ -1,0 +1,6 @@
+inputs:
+  upstream-devenv:
+    url: github:cachix/devenv?dir=src/modules
+  lnbits:
+    url: path:/home/jfroche/projects/satsenv/lnbits/dev
+    flake: true

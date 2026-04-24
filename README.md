@@ -49,6 +49,70 @@ Runs a `bitcoind` daemon as a devenv process with readiness probes and graceful 
 
 When enabled, the module sets `BITCOIN_RPC_URL` in the environment for convenience.
 
+### lnd
+
+Runs `lnd` as a devenv process, wired to an auto-enabled `services.bitcoind`. Exposes read-only `network`, `certFile`, and `macaroonFile` fields so downstream modules can reference the data-dir layout without reproducing it.
+
+```nix
+{ ... }:
+{
+  services.lnd = {
+    enable = true;
+    # listenAddress = "127.0.0.1";
+    # listenPort = 9735;
+    # rpcAddress = "127.0.0.1";
+    # rpcPort = 10009;
+    # restAddress = "127.0.0.1";
+    # restPort = 8080;
+    # extraConfig = "";
+  };
+}
+```
+
+When enabled, the module sets `LND_CERT_FILE`, `LND_MACAROON_FILE`, and `LND_GRPC_HOST` in the environment.
+
+### lnbits
+
+Runs [LNbits](https://lnbits.com) as a devenv process. The `package` option must be provided — typically from an external flake input.
+
+```nix
+{ pkgs, inputs, ... }:
+{
+  services.lnbits = {
+    enable = true;
+    package = inputs.lnbits.packages.${pkgs.stdenv.hostPlatform.system}.default;
+
+    # host = "127.0.0.1";
+    # port = 8231;
+    # dataDir = "${config.devenv.state}/lnbits";
+    # env.LNBITS_ADMIN_UI = "true";
+
+    # Funding source backends — at most one enable = true at a time.
+    # backends.lnd.enable = true;   # LndWallet (gRPC), auto-wires services.lnd
+  };
+}
+```
+
+When `backends.lnd.enable` is set, the module auto-enables `services.lnd`, sets `LNBITS_BACKEND_WALLET_CLASS=LndWallet`, and defaults `backends.lnd.{endpoint,port,certFile,macaroonFile}` from `services.lnd`. A tee'd copy of the LNbits process output is written to `services.lnbits.logFile` (`${dataDir}/lnbits.log` by default) for startup introspection.
+
+### nostr-rs-relay
+
+Runs [nostr-rs-relay](https://git.sr.ht/~gheartsfield/nostr-rs-relay) as a devenv process, accepting a free-form `settings` attrset merged into `config.toml`.
+
+```nix
+{ ... }:
+{
+  services.nostr-rs-relay = {
+    enable = true;
+    # address = "127.0.0.1";
+    # port = 8080;
+    # settings.info.name = "My relay";
+  };
+}
+```
+
+When enabled, the module sets `NOSTR_RELAY_URL` in the environment.
+
 ### podman-machine
 
 Manages a Podman machine lifecycle (init, start, stop) as a devenv process.
