@@ -72,6 +72,7 @@ let
       { _module.args = { inherit pkgs; }; }
       devenvStub
       ../src/modules/bitcoind.nix
+      ../src/modules/clightning.nix
       ../src/modules/lnd.nix
       ../src/modules/nostr-rs-relay.nix
       ../src/modules/podman.nix

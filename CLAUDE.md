@@ -73,11 +73,12 @@ Start every implementation task by creating or updating the test, not the module
 Once the red-green cycle is green, do all of the following in order before declaring the task complete or committing:
 
 1. **Update README.md** — whenever a module is added, renamed, or its public option surface changes, revise the relevant section of `README.md` (and add a new section for new modules) so it stays in sync with `src/modules/`.
-2. **Document with showboat** — append this session's commands, notes, and outputs to `docs/notes/<topic>/demo.md`. See "Documenting work with showboat" above for the commands.
-3. **Review with `/tuicr`** — invoke the tuicr skill against the repo to interactively inspect staged + unstaged diffs plus the pending commits before committing.
-4. **Commit with jj** — describe each logical change separately; atomic, conventional subject lines (`feat(...)`, `docs(...)`, etc).
+2. **Update `docs/src/index.md`** — keep the "Available modules" list and any usage examples there aligned with the same module changes that prompted the README update.
+3. **Document with showboat** — append this session's commands, notes, and outputs to `docs/notes/<topic>/demo.md`. See "Documenting work with showboat" above for the commands.
+4. **Review with `/tuicr`** — invoke the tuicr skill against the repo to interactively inspect staged + unstaged diffs plus the pending commits before committing.
+5. **Commit with jj** — describe each logical change separately; atomic, conventional subject lines (`feat(...)`, `docs(...)`, etc).
 
-Skipping steps 1–3 is a regression. If the user says "commit", treat that as step 4 only once the earlier steps are done; otherwise run them first (or ask if skipping is intentional).
+Skipping steps 1–4 is a regression. If the user says "commit", treat that as step 5 only once the earlier steps are done; otherwise run them first (or ask if skipping is intentional).
 
 ## Test script conventions
 
