@@ -167,3 +167,72 @@ Running tests in 103ms
 
 Ran 1 tests, 0 failed, 0 skipped.
 ```
+
+Session 2: added the LND gRPC funding source backend. Designed the module for future backends: services.lnbits.backends.<name>.enable gates per-backend wiring. When backends.lnd.enable is set, the module auto-enables services.lnd (mkDefault true), emits LND_GRPC_* env vars defaulted from services.lnd, orders lnbits after lnd (native after + process-compose depends_on), and sets LNBITS_BACKEND_WALLET_CLASS=LndWallet. An assertion enforces at most one backend active so adding the next backend (lndRest, corelightning, ...) stays mechanical.
+
+Log visibility: devenv's native process manager does not split per-process logs, so the module now adds services.lnbits.logFile (defaults to ${dataDir}/lnbits.log) and tees lnbits stdout/stderr into it. This is what the new test greps to assert 'Funding source: LndWallet' appeared without 'Error initializing LndWallet'.
+
+```bash
+cat tests/lnbits-lnd/devenv.nix tests/lnbits-lnd/.test.sh
+```
+
+```output
+{ pkgs, inputs, ... }:
+{
+  packages = [ pkgs.curl pkgs.jq ];
+
+  services.lnbits = {
+    enable = true;
+    package = inputs.lnbits.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    backends.lnd.enable = true;
+    env = {
+      LNBITS_ADMIN_UI = "false";
+    };
+  };
+}
+#!/usr/bin/env bash
+set -e
+
+wait_for_processes
+
+log_file="$DEVENV_STATE/lnbits/lnbits.log"
+if [ ! -f "$log_file" ]; then
+  echo "Expected lnbits log at $log_file, but it does not exist" >&2
+  exit 1
+fi
+
+# Give lnbits a moment to emit its startup banner (log_server_info runs after
+# set_funding_source, so either "Funding source: ..." or "Error initializing ..."
+# will appear in the log once startup completes).
+for _ in $(seq 1 30); do
+  if grep -q "Funding source:" "$log_file" 2>/dev/null; then
+    break
+  fi
+  sleep 1
+done
+
+if grep -q "Error initializing LndWallet" "$log_file"; then
+  echo "lnbits failed to initialize the LndWallet funding source:" >&2
+  grep -n "Error initializing\|lnd_grpc" "$log_file" >&2 || true
+  exit 1
+fi
+
+if ! grep -q "Funding source: LndWallet" "$log_file"; then
+  echo "lnbits did not report 'Funding source: LndWallet' in its log" >&2
+  grep -n "Funding source" "$log_file" >&2 || true
+  exit 1
+fi
+
+echo "lnbits is configured with the LndWallet funding source" >&2
+
+# Sanity: homepage still serves the LNbits UI.
+output=$(curl -sSf http://127.0.0.1:8231/)
+if ! echo "$output" | grep -q "<title>LNbits</title>"; then
+  echo "lnbits homepage did not return the expected title" >&2
+  exit 1
+fi
+
+echo "lnbits-lnd test passed" >&2
+```
+
+CLAUDE.md update: added a 'Session completion checklist' so showboat + /tuicr are no longer forgotten when wrapping up a task. Steps: sync README, document with showboat, review with /tuicr, then commit with jj.
