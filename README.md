@@ -71,6 +71,25 @@ Runs `lnd` as a devenv process, wired to an auto-enabled `services.bitcoind`. Ex
 
 When enabled, the module sets `LND_CERT_FILE`, `LND_MACAROON_FILE`, and `LND_GRPC_HOST` in the environment.
 
+### clightning
+
+Runs Core Lightning (`lightningd`) as a devenv process, auto-enabling `services.bitcoind` and wiring its RPC credentials. Network is derived from `services.bitcoind.regtest` and exposed read-only as `services.clightning.network`. The RPC socket path is exposed read-only as `services.clightning.rpcFile`.
+
+```nix
+{ ... }:
+{
+  services.clightning = {
+    enable = true;
+    # address = "127.0.0.1";
+    # port = 9735;
+    # dataDir = "${config.devenv.state}/clightning";
+    # wallet = "sqlite3://.../lightningd.sqlite3";  # postgres://... also supported
+    # useBcliPlugin = true;  # set false when using a plugin like trustedcoin
+    # extraConfig = "";      # extra lightningd config lines
+  };
+}
+```
+
 ### lnbits
 
 Runs [LNbits](https://lnbits.com) as a devenv process. The `package` option must be provided — typically from an external flake input.

@@ -6,6 +6,8 @@ Custom [devenv](https://devenv.sh) modules for Bitcoin and related services.
 
 - **bitcoind** — Bitcoin daemon with regtest support and ZMQ pub/sub
 - **lnd** — Lightning Network daemon, automatically configures bitcoind with ZMQ
+- **clightning** — Core Lightning (`lightningd`) daemon wired to bitcoind
+- **lnbits** — LNbits server with optional LND gRPC funding backend
 - **nostr-rs-relay** — Nostr relay with structured TOML settings
 - **podman-machine** — Podman machine lifecycle management
 
