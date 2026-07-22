@@ -4,15 +4,23 @@ Custom [devenv](https://devenv.sh) modules for Bitcoin and related services.
 
 ## Usage
 
-Add this repository as an input in your project's `devenv.yaml` and import the modules you need.
+Add this repository as an input in your project's `devenv.yaml`, along with the
+required `upstream-devenv` input. Also add the `imports` section:
 
 ```yaml
 inputs:
+  upstream-devenv:
+    url: github:cachix/devenv?dir=src/modules
   sats-dev:
     url: github:satsenv/sats-dev?dir=src/modules
 imports:
   - sats-dev
 ```
+
+Notes:
+
+- `upstream-devenv` is required — the sats-dev modules import options from it. Omitting it produces `error: attribute 'upstream-devenv' missing`.
+- For local development against a checkout, replace the `sats-dev` URL with `path:/absolute/path/to/sats-dev?dir=src/modules`.
 
 Then use the module options in your `devenv.nix`:
 
