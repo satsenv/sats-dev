@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://devenv.sh/devenv.schema.json
+inputs:
+  nixpkgs:
+    url: github:cachix/devenv-nixpkgs/rolling
+  # sats-dev's top-level.nix pulls in upstream devenv modules via this input.
+  upstream-devenv:
+    url: github:cachix/devenv?dir=src/modules
+  sats-dev:
+    url: github:satsenv/sats-dev?dir=src/modules
+  # Uncomment if you enable services.lnbits — provide a real lnbits flake:
+  # lnbits:
+  #   url: github:lnbits/lnbits
+imports:
+  - sats-dev

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://skills.sh/schema.json",
+  "name": "sats-dev",
+  "description": "AI agent skills for bootstrapping Bitcoin/Lightning development environments with sats-dev devenv modules.",
+  "skills": [
+    {
+      "name": "sats-dev-init",
+      "path": ".agents/skills/sats-dev-init",
+      "entrypoint": "SKILL.md",
+      "description": "Initialize a new devenv project preconfigured with sats-dev modules (bitcoind, lnd, clightning, lnbits, nostr-rs-relay, podman-machine)."
+    }
+  ]
+}

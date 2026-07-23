@@ -4,6 +4,10 @@ Custom [devenv](https://devenv.sh) modules for Bitcoin and related services.
 
 ## Usage
 
+> 💡 **Prefer an AI-assisted bootstrap?** This repo ships with a goose skill
+> at [`skills/sats-dev-init/`](skills/sats-dev-init/) that scaffolds a working `devenv.yaml` +
+> `devenv.nix` for you. See [`docs/src/guides/ai-skill.md`](docs/src/guides/ai-skill.md).
+
 Add this repository as an input in your project's `devenv.yaml`, along with the
 required `upstream-devenv` input. Also add the `imports` section:
 

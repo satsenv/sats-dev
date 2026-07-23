@@ -1,0 +1,45 @@
+{ pkgs, lib, config, inputs, ... }:
+
+{
+  # https://devenv.sh/basics/
+  packages = [ pkgs.git ];
+
+  # ---------------------------------------------------------------------------
+  # sats-dev services — uncomment the ones you need.
+  # Full reference: https://github.com/satsenv/sats-dev
+  # ---------------------------------------------------------------------------
+
+  # services.bitcoind = {
+  #   enable = true;
+  #   regtest = true;
+  #   # rpcUser = "devenv";
+  #   # rpcPassword = "devenv";
+  # };
+
+  # services.lnd = {
+  #   enable = true;   # auto-enables services.bitcoind
+  # };
+
+  # services.clightning = {
+  #   enable = true;   # auto-enables services.bitcoind
+  # };
+
+  # services.lnbits = {
+  #   enable = true;
+  #   package = inputs.lnbits.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  #   # backends.lnd.enable = true;   # auto-wires services.lnd
+  # };
+
+  # services.nostr-rs-relay = {
+  #   enable = true;
+  #   # settings.info.name = "My relay";
+  # };
+
+  # services.podman-machine = {
+  #   enable = true;
+  # };
+
+  enterShell = ''
+    echo "sats-dev devenv ready. Try: devenv up"
+  '';
+}
