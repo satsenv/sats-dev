@@ -42,7 +42,33 @@ Skills are discovered from two locations:
 | Project | `<repo>/skills/`                       | Cloned this repo, working inside it  |
 | Global  | `~/.agents/skills/`                    | Available from any working directory |
 
-### Option A — Use it from a clone of this repo
+### Option A — Install with `npx skills` (recommended)
+
+Fetch and install the skill straight from the `satsenv/sats-dev` repository
+using the `skills` CLI (no clone required):
+
+```bash
+nix shell nixpkgs#nodejs -c npx skills add satsenv/sats-dev
+```
+
+The command runs interactively and prompts you to choose the install scope:
+
+- **Project** — installs into `<repo>/skills/`, available only inside the
+  current project.
+- **Global** — installs into `~/.agents/skills/`, available from any working
+  directory.
+
+For non-interactive use (e.g. in CI or scripts), pass the scope explicitly:
+
+```bash
+# Force project-level install
+nix shell nixpkgs#nodejs -c npx skills add satsenv/sats-dev --project
+
+# Force global install
+nix shell nixpkgs#nodejs -c npx skills add satsenv/sats-dev --global
+```
+
+### Option B — Use it from a clone of this repo
 
 ```bash
 git clone https://github.com/satsenv/sats-dev.git
@@ -53,10 +79,9 @@ goose session
 Goose will automatically pick up `skills/sats-dev-init` and list it in
 its available skills at session start.
 
-### Option B — Install it globally
+### Option C — Install it globally by hand
 
-Copy the skill into your user-level skills directory so it's available from
-any project:
+If you already have a clone and prefer to copy the files yourself:
 
 ```bash
 mkdir -p ~/.agents/skills
