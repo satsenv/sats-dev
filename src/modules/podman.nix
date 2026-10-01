@@ -108,23 +108,6 @@ in
           '';
         }
       );
-      process-compose = {
-        is_daemon = true;
-        readiness_probe = {
-          exec = {
-            command = pkgs.writeShellScript "is-machine-ready" ''
-              CONTAINER_CONNECTION=${cfg.machineName} podman ps
-            '';
-          };
-          failure_threshold = 20;
-          period_seconds = 10;
-        };
-        shutdown = {
-          command = "podman machine stop ${cfg.machineName}";
-          timeout_seconds = 10;
-          signal = 9;
-        };
-      };
     };
   };
 }

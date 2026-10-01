@@ -76,17 +76,6 @@ in
         period = 2;
         failure_threshold = 20;
       };
-      process-compose = {
-        readiness_probe = {
-          exec = {
-            command = pkgs.writeShellScript "is-nostr-rs-relay-ready" ''
-              ${lib.getExe pkgs.curl} -sf -H "Accept: application/nostr+json" "http://${cfg.address}:${toString cfg.port}" > /dev/null 2>&1
-            '';
-          };
-          failure_threshold = 20;
-          period_seconds = 2;
-        };
-      };
     };
 
     env.NOSTR_RELAY_URL = "ws://${cfg.address}:${toString cfg.port}";

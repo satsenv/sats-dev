@@ -1,1 +1,0 @@
-../bitcoind/.test.sh
