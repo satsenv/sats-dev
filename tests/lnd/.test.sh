@@ -21,9 +21,19 @@ else
   exit 1
 fi
 
-# Verify lnd is synced to chain
-synced=$(echo "$info" | jq -r '.synced_to_chain')
-block_height=$(echo "$info" | jq -r '.block_height')
+# Verify lnd is synced to chain. lnd learns about the new block over ZMQ
+# asynchronously, so retry briefly instead of asserting on the first read.
+synced=false
+block_height=0
+for _ in $(seq 1 30); do
+  info=$($LNCLI getinfo)
+  synced=$(echo "$info" | jq -r '.synced_to_chain')
+  block_height=$(echo "$info" | jq -r '.block_height')
+  if [ "$synced" = "true" ]; then
+    break
+  fi
+  sleep 1
+done
 if [ "$synced" = "true" ]; then
   echo "lnd is synced to chain at height $block_height" >&2
 else
