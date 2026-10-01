@@ -1,0 +1,3 @@
+inputs:
+  upstream-devenv:
+    url: github:cachix/devenv?dir=src/modules
