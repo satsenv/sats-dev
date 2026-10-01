@@ -26,4 +26,8 @@ jobs:
         run: nix profile install nixpkgs#devenv
 
       - name: Run tests
-        run: devenv-run-tests run tests
+        # Must run inside the repo shell: devenv-run-tests resolves its test
+        # environment from the host repo's flake.lock, which this devenv.yaml
+        # project doesn't have. The shell exports DEVENV_TEST_ENV (see
+        # devenv.nix), which takes precedence over the flake.lock lookup.
+        run: devenv shell -- devenv-run-tests run tests
