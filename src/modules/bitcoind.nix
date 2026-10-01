@@ -137,33 +137,10 @@ in
         period = 2;
         failure_threshold = 20;
       };
-      process-compose = {
-        readiness_probe = {
-          exec = {
-            command = pkgs.writeShellScript "is-bitcoind-ready" ''
-              ${lib.getExe' cfg.package "bitcoin-cli"} \
-                -datadir="${cfg.dataDir}" \
-                -rpcuser="${cfg.rpcUser}" \
-                -rpcpassword="${cfg.rpcPassword}" \
-                ${lib.optionalString cfg.regtest "-regtest"} \
-                getblockchaininfo > /dev/null 2>&1
-              ${lib.optionalString zmq.enable zmqReadyCheck}
-            '';
-          };
-          failure_threshold = 20;
-          period_seconds = 2;
-        };
-        shutdown = {
-          command = ''
-            ${lib.getExe' cfg.package "bitcoin-cli"} \
-              -datadir="${cfg.dataDir}" \
-              -rpcuser="${cfg.rpcUser}" \
-              -rpcpassword="${cfg.rpcPassword}" \
-              ${lib.optionalString cfg.regtest "-regtest"} \
-              stop
-          '';
-          timeout_seconds = 30;
-        };
+      # bitcoind flushes and closes cleanly on SIGTERM; keep the 30s grace
+      # the old process-compose shutdown command allowed.
+      shutdown = {
+        grace = 30;
       };
     };
 

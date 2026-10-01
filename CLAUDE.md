@@ -26,6 +26,7 @@ The `upstream-devenv` input is declared in each test's `devenv.yaml` as `github:
 ## devenv-run-tests behavior
 
 - `devenv-run-tests run tests` scans the `tests/` directory for subdirectories; each subdirectory is a test.
+- CLI 2.4.0's runner resolves its test environment from the host repo's `flake.lock`; this devenv.yaml project has none, so the repo shell exports `DEVENV_TEST_ENV` (built from vendored `nix/test-env.nix`) which takes precedence.
 - Each test is copied to a temp dir, git-initialized, then `devenv test` runs inside it.
 - The argument to `run` is a parent directory, not a test name. Use `--only <name>` to filter.
 - `.test.sh` must be executable (`chmod +x`).
@@ -35,8 +36,7 @@ The `upstream-devenv` input is declared in each test's `devenv.yaml` as `github:
 - `devenv test` provides `wait_for_processes` and `wait_for_port` as exported shell functions in the test environment.
 - `wait_for_processes` blocks until all processes with readiness probes report healthy.
 - The native process manager uses the `ready` option on process definitions (`lib/ready.nix` submodule type with `exec`, `http`, or `notify`).
-- The `process-compose` readiness probe (under `process-compose.readiness_probe`) is only used by the process-compose backend, not the native manager.
-- For compatibility with both backends, define both `ready` and `process-compose.readiness_probe`.
+- process-compose is not supported: define only the native `ready` probe. Use the native `shutdown.grace` option (seconds before SIGKILL) when a daemon needs more time to stop cleanly.
 
 ## Test output visibility
 

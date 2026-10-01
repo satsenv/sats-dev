@@ -167,24 +167,6 @@ in
         period = 2;
         failure_threshold = 60;
       };
-      process-compose = {
-        # devenv's process-compose backend does not forward the top-level
-        # `cwd`, so set process-compose's own `working_dir` via the escape
-        # hatch for parity with the native/mprocs backends.
-        working_dir = "${cfg.package}/lib/python3.12/site-packages";
-        depends_on = lib.mkIf cfg.backends.lnd.enable {
-          lnd.condition = "process_healthy";
-        };
-        readiness_probe = {
-          exec = {
-            command = pkgs.writeShellScript "is-lnbits-ready" ''
-              ${lib.getExe pkgs.curl} -sSf "http://${cfg.host}:${toString cfg.port}/" > /dev/null 2>&1
-            '';
-          };
-          failure_threshold = 60;
-          period_seconds = 2;
-        };
-      };
     };
   };
 }

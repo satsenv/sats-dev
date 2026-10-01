@@ -141,23 +141,10 @@ in
         period = 2;
         failure_threshold = 30;
       };
-      process-compose = {
-        readiness_probe = {
-          exec = {
-            command = pkgs.writeShellScript "is-clightning-ready" ''
-              test -S "${cfg.rpcFile}" && ${lightningCliCmd} getinfo > /dev/null 2>&1
-            '';
-          };
-          failure_threshold = 30;
-          period_seconds = 2;
-        };
-        depends_on.bitcoind.condition = "process_healthy";
-        shutdown = {
-          command = ''
-            ${lightningCliCmd} stop
-          '';
-          timeout_seconds = 30;
-        };
+      # lightningd shuts down cleanly on SIGTERM; keep the 30s grace the
+      # old process-compose shutdown command allowed.
+      shutdown = {
+        grace = 30;
       };
     };
   };

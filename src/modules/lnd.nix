@@ -162,23 +162,10 @@ in
         period = 2;
         failure_threshold = 30;
       };
-      process-compose = {
-        readiness_probe = {
-          exec = {
-            command = pkgs.writeShellScript "is-lnd-ready" ''
-              test -f "${cfg.macaroonFile}" && ${lncliCmd} getinfo > /dev/null 2>&1
-            '';
-          };
-          failure_threshold = 30;
-          period_seconds = 2;
-        };
-        depends_on.bitcoind.condition = "process_healthy";
-        shutdown = {
-          command = ''
-            ${lncliCmd} stop
-          '';
-          timeout_seconds = 30;
-        };
+      # lnd shuts down cleanly on SIGTERM; keep the 30s grace the old
+      # process-compose shutdown command allowed.
+      shutdown = {
+        grace = 30;
       };
     };
   };
