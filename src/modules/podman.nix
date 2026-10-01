@@ -6,6 +6,17 @@
 let
   cfg = config.services.podman-machine;
   types = lib.types;
+  # podman resolves machine helpers (gvproxy, virtiofsd) via
+  # helper_binaries_dir — PATH is not searched. The nixpkgs podman
+  # wrapper pre-populates its own libexec only on darwin, so on Linux we
+  # point podman at the helpers ourselves.
+  podmanMachineHelpers = pkgs.symlinkJoin {
+    name = "podman-machine-helpers";
+    paths = [
+      pkgs.gvproxy
+      pkgs.virtiofsd
+    ];
+  };
 in
 {
   options.services.podman-machine = {
@@ -21,6 +32,12 @@ in
   config = lib.mkIf cfg.enable {
     env = {
       CONTAINER_CONNECTION = "${cfg.machineName}";
+    }
+    // lib.optionalAttrs pkgs.stdenv.isLinux {
+      CONTAINERS_CONF = "${pkgs.writeText "containers.conf" ''
+        [engine]
+        helper_binaries_dir = ["${podmanMachineHelpers}/bin"]
+      ''}";
     };
     packages = [
       pkgs.podman
