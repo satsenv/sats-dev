@@ -28,6 +28,7 @@ The `upstream-devenv` input is declared in each test's `devenv.yaml` as `github:
 - `devenv-run-tests run tests` scans the `tests/` directory for subdirectories; each subdirectory is a test.
 - CLI 2.4.0's runner resolves its test environment from the host repo's `flake.lock`; this devenv.yaml project has none, so the repo shell exports `DEVENV_TEST_ENV` (built from vendored `nix/test-env.nix`) which takes precedence.
 - Each test is copied to a temp dir, git-initialized, then `devenv test` runs inside it.
+- The module tree reaches the test as a `path:` flake input, which snapshots only git-tracked files: new files under `src/modules/` are invisible to the runner until at least `git add -N` (intent-to-add). A "path '.../src/modules/<x>.nix' does not exist" eval error means you forgot this.
 - The argument to `run` is a parent directory, not a test name. Use `--only <name>` to filter.
 - `.test.sh` must be executable (`chmod +x`).
 
