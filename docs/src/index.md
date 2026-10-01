@@ -4,6 +4,7 @@ Custom [devenv](https://devenv.sh) modules for Bitcoin and related services.
 
 ## Available modules
 
+- **bark** — Ark tooling by Second: `bark` CLI, `barkd` REST daemon, and `captaind` Ark server (from the external `gitlab:ark-bitcoin/bark` flake input)
 - **bitcoind** — Bitcoin daemon with regtest support and ZMQ pub/sub
 - **lnd** — Lightning Network daemon, automatically configures bitcoind with ZMQ
 - **clightning** — Core Lightning (`lightningd`) daemon wired to bitcoind
