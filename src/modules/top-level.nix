@@ -2,6 +2,7 @@
 {
   imports = [
     "${inputs.upstream-devenv}/top-level.nix"
+    ./bark.nix
     ./bitcoind.nix
     ./clightning.nix
     ./lnbits.nix
