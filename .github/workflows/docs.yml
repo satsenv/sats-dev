@@ -20,7 +20,9 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  # Per-ref group: main pushes still serialize (shared refs/heads/main
+  # group), but a main push no longer auto-cancels queued PR runs.
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -46,9 +48,13 @@ jobs:
         working-directory: docs
         run: devenv shell -- bash -c 'generate-options && mkdocs build --strict'
 
+      # Publishing pipeline: pushes to main only. On pull requests the
+      # build above validates the docs and the run ends there.
       - uses: actions/configure-pages@v5
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           path: docs/site
 
