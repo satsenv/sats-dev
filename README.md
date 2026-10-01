@@ -40,6 +40,43 @@ Then use the module options in your `devenv.nix`:
 
 ## Modules
 
+### bark
+
+Ark (by [Second](https://second.tech)) tooling: the `bark` wallet CLI, the `barkd` REST wallet daemon, and `captaind`, the Ark server (ASP).
+
+Packages come from the external flake input `gitlab:ark-bitcoin/bark`, declared in your `devenv.yaml`:
+
+```yaml
+inputs:
+  bark:
+    url: gitlab:ark-bitcoin/bark/bark-0.7.1
+    flake: true
+```
+
+Enabling any `services.bark.*` component without that input fails evaluation with these same instructions (unless you set the corresponding `package` option explicitly).
+
+```nix
+{ pkgs, inputs, ... }:
+{
+  services.bitcoind.regtest = true;  # the bark network is derived from this
+
+  services.bark = {
+    enable = true;                   # bark CLI (+ barkd) in the shell
+    package = inputs.bark.packages.${pkgs.stdenv.hostPlatform.system}.bark;
+
+    server.enable = true;            # captaind, the Ark server
+    barkd.enable = true;             # REST wallet daemon on 127.0.0.1:3000
+  };
+}
+```
+
+- `services.bark.server` runs `captaind` as a devenv process. On first start it initializes the server wallet and database (`captaind create`), then serves via `captaind start` (which self-migrates the schema). It auto-enables `services.bitcoind` (injecting `txindex=1`) and `services.postgres` (loopback TCP plus a `bark-server-db` database owned by a `bark` role — both overridable under `services.bark.server.postgres`).
+- The generated captaind config follows upstream's `captaind.default.toml` values, wired to the sats-dev bitcoind and postgres settings. Ports: public Ark gRPC `3535`, admin gRPC `3536` (unauthenticated, loopback only), integration gRPC `3537`.
+- captaind comes prebuilt from the bark flake on x86_64-linux; on other hosts (e.g. aarch64-darwin) it is built from the pinned source, which takes a while on first build. Note the `bark.cachix.org` cache currently ships no darwin artifacts for bark-0.7.1 either, so on macOS the `bark` CLI package is likewise a lengthy one-time source build.
+- `services.bark.barkd` binds loopback behind a bearer token by default — print it with `barkd --datadir "$DEVENV_STATE/barkd" secret show` — or set `services.bark.barkd.noAuth = true`.
+
+When the server is enabled the environment gets `BARK_ASP_URL` (public Ark gRPC) and `BARK_ADMIN_RPC_ADDR`; barkd sets `BARKD_URL`.
+
 ### bitcoind
 
 Runs a `bitcoind` daemon as a devenv process with readiness probes and graceful shutdown.
