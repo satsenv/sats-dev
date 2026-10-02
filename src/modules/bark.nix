@@ -8,6 +8,15 @@ let
   cfg = config.services.bark;
   bitcoind = config.services.bitcoind;
   postgres = config.services.postgres;
+  # With TCP enabled, devenv allocates the real postgres port at eval time
+  # and bumps past a busy base port (processes.postgres.ports.main.value),
+  # while services.postgres.port keeps the base value. Bake the allocated
+  # port into captaind.toml so the two never disagree. Same conditional as
+  # devenv's postgres.nix allocatedPort.
+  postgresPort =
+    if postgres.enable && postgres.listen_addresses != ""
+    then config.processes.postgres.ports.main.value
+    else postgres.port;
   types = lib.types;
   system = pkgs.stdenv.hostPlatform.system;
 
@@ -152,7 +161,7 @@ let
 
     [postgres]
     host = "127.0.0.1"
-    port = ${toString postgres.port}
+    port = ${toString postgresPort}
     name = "${cfg.server.postgres.dbName}"
     user = "${cfg.server.postgres.user}"
     password = "${cfg.server.postgres.password}"
