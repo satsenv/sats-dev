@@ -171,7 +171,7 @@ in
     package = lib.mkOption {
       type = types.package;
       default = barkInput.packages.${system}.bark;
-      defaultText = lib.literalExpression "inputs.bark.packages.''${system}.bark";
+      defaultText = lib.literalExpression "inputs.bark.packages.\${system}.bark";
       description = ''
         The bark package to use, providing the `bark` CLI and `barkd` daemon
         binaries. Typically sourced from the external flake input
@@ -185,7 +185,7 @@ in
       package = lib.mkOption {
         type = types.package;
         default = defaultServerPackage;
-        defaultText = lib.literalExpression "inputs.bark.packages.''${system}.bark-server or (source build via nix/bark-server.nix)";
+        defaultText = lib.literalExpression "inputs.bark.packages.\${system}.bark-server or (source build via nix/bark-server.nix)";
         description = ''
           The bark-server package to use, providing `captaind` and
           `watchmand`. Defaults to upstream's prebuilt package where shipped

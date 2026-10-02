@@ -12,6 +12,7 @@
   scripts."generate-options" = {
     description = "Generate module options documentation.";
     exec = ''
+      set -e
       mkdir -p ${config.devenv.root}/generated
       out=$(nix build -f ${config.devenv.root}/options.nix --no-link --print-out-paths)
       install -m 644 "$out" ${config.devenv.root}/generated/options.md
